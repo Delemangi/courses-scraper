@@ -1,10 +1,11 @@
 import argparse
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from requests.adapters import HTTPAdapter
 from tqdm import tqdm
 from urllib3.util.retry import Retry
@@ -30,12 +31,12 @@ attribute_names = {
 df_column_order = ['ID', 'Name', 'Mail', 'Courses', 'Last Access', 'Description', 'Country', 'City', 'Interests', 'Web', 'Skype', 'MSN', 'Yahoo', 'ICQ', 'AIM']
 
 
-def get_profile_name(soup: BeautifulSoup) -> str:
-    return soup.select_one(profile_name_selector).text
+def get_profile_name(element: Tag):
+    return element.select_one(profile_name_selector).text
 
 
-def get_profile_description(soup: BeautifulSoup) -> str:
-    p_description = soup.select_one(profile_description_selector)
+def get_profile_description(element: Tag):
+    p_description = element.select_one(profile_description_selector)
 
     if p_description:
         return p_description.text
@@ -43,9 +44,9 @@ def get_profile_description(soup: BeautifulSoup) -> str:
     return ''
 
 
-def get_profile_details(section: BeautifulSoup):
+def get_profile_details(element: Tag):
     attributes: dict[str, str] = {}
-    details_elements = section.select(profile_details_selector)
+    details_elements = element.select(profile_details_selector)
 
     for e in details_elements:
         text = e.dt.text
@@ -64,26 +65,26 @@ def get_profile_details(section: BeautifulSoup):
     return attributes
 
 
-def get_profile_courses(section: BeautifulSoup):
-    courses_li_tags = section.select(profile_courses_selector)
+def get_profile_courses(element: Tag):
+    courses_li_tags = element.select(profile_courses_selector)
     courses = [course_li.text for course_li in courses_li_tags]
 
     return '\n'.join(courses)
 
 
-def get_profile_last_access(section: BeautifulSoup):
-    return section.select_one(profile_last_access_selector).text.replace(u'\xa0', ';')
+def get_profile_last_access(element: Tag):
+    return element.select_one(profile_last_access_selector).text.replace('\xa0', ';')
 
 
-def get_profile_attributes(soup: BeautifulSoup) -> dict:
+def get_profile_attributes(element: Tag):
     profile: dict[str, str] = {}
-    sections = soup.select('#region-main > div > div > div.profile_tree > section')
+    sections = element.select('#region-main > div > div > div.profile_tree > section')
 
     if len(sections) == 0:
         return {}
 
-    profile['Name'] = get_profile_name(soup)
-    profile['Description'] = get_profile_description(soup)
+    profile['Name'] = get_profile_name(element)
+    profile['Description'] = get_profile_description(element)
 
     for section in sections:
         lead = section.select_one('h3.lead')
@@ -98,12 +99,12 @@ def get_profile_attributes(soup: BeautifulSoup) -> dict:
     return profile
 
 
-def get_profile(session: requests.Session, id: int):
-    profile_url = f'https://courses.finki.ukim.mk/user/profile.php?id={id}&showallcourses=1'
+def get_profile(session: requests.Session, profile_id: int):
+    profile_url = f'https://courses.finki.ukim.mk/user/profile.php?id={profile_id}&showallcourses=1'
     response = session.get(profile_url)
 
     if response.status_code != 200:
-        print(id, response)
+        print(profile_id, response)
         return {}
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -112,11 +113,11 @@ def get_profile(session: requests.Session, id: int):
         profile = get_profile_attributes(soup)
     except Exception as e:
         print(e)
-        print(id, response)
+        print(profile_id, response)
         raise e
 
     if profile:
-        profile['ID'] = id
+        profile['ID'] = profile_id
 
     return profile
 
@@ -164,6 +165,7 @@ def get_courses_session(cookie: str):
 def main():
     args = parse_args()
     session = get_courses_session(args.c)
+    start = time.time()
 
     if args.i is not None:
         profiles = get_profiles(session, args.i, args.t)
@@ -178,6 +180,7 @@ def main():
     df.to_csv('data/' + args.o, index=False)
 
     print(df)
+    print(f'Finished in {time.time() - start} seconds')
 
 
 if __name__ == '__main__':
