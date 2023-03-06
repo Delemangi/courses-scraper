@@ -1,12 +1,12 @@
 # Courses Scraper
 
-Script for scraping Courses.
+Script for scraping all profiles from Courses.
 
 ## Installation
 
 Python >= 3.9 is required.
 
-1. python -m pip install -r requirements.txt
+`python -m pip install -r requirements.txt`
 
 ## Running
 
@@ -19,3 +19,5 @@ Arguments:
 3. `-o` - output file name
 4. `-i` - profile IDs to be scraped
 5. `-m` - upper limit of profile IDs to be scraped
+
+The arguments `-c` and either one of `-i` or `-m` are required.
