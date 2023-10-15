@@ -10,7 +10,7 @@ Python >= 3.9 is required.
 
 ## Running
 
-`python scraper.py <arguments>`
+`python -m app <arguments>`
 
 Arguments:
 
