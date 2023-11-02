@@ -17,6 +17,15 @@ def get_profile_name(element: Tag) -> str:
     return element.select_one(selectors["name_selector"]).text
 
 
+def get_profile_avatar(element: Tag) -> str:
+    avatar = element.select_one(selectors["avatar_selector"])
+
+    if "defaultuserpic" in avatar.attrs["class"]:
+        return ""
+
+    return avatar["src"]
+
+
 def get_profile_description(element: Tag) -> str:
     description = element.select_one(selectors["description_selector"])
 
@@ -77,6 +86,7 @@ def get_profile_attributes(element: Tag) -> dict[str, str]:
     profile["Name"] = get_profile_name(element)
     profile["Description"] = get_profile_description(element)
     profile["Images"] = get_profile_description_images(element)
+    profile["Avatar"] = get_profile_avatar(element)
 
     for section in sections:
         attribute = section.select_one(selectors["attribute_selector"])

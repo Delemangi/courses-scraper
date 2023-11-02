@@ -8,6 +8,7 @@ selectors = {
     "sections_selector": "#region-main > div > div > div.profile_tree > section",
     "interests_selector": "li:not(.visibleifjs)",
     "attribute_selector": "h3.lead",
+    "avatar_selector": ".page-header-image > img",
 }
 
 fields = {
@@ -22,6 +23,7 @@ fields = {
     "Country": "Country",
     "City/town": "City",
     "MoodleNet profile": "MoodleNet",
+    "Avatar": "Avatar",
 }
 
 columns = [
@@ -30,6 +32,7 @@ columns = [
     "Mail",
     "Courses",
     "Last Access",
+    "Avatar",
     "Description",
     "Images",
     "Country",
