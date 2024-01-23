@@ -46,3 +46,5 @@ columns = [
     "ICQ",
     "AIM",
 ]
+
+http_ok = 200

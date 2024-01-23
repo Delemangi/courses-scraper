@@ -1,7 +1,8 @@
 import argparse
-import os
 import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 import requests
@@ -10,20 +11,25 @@ from requests.adapters import HTTPAdapter
 from tqdm import tqdm
 from urllib3.util.retry import Retry
 
-from app.constants import columns, fields, selectors
+from app.constants import columns, fields, http_ok, selectors
 
 
 def get_profile_name(element: Tag) -> str:
-    return element.select_one(selectors["name_selector"]).text
+    name = element.select_one(selectors["name_selector"])
+
+    if name is None:
+        return ""
+
+    return name.text
 
 
 def get_profile_avatar(element: Tag) -> str:
     avatar = element.select_one(selectors["avatar_selector"])
 
-    if "defaultuserpic" in avatar.attrs["class"]:
+    if avatar is None or "defaultuserpic" in avatar.attrs["class"]:
         return ""
 
-    return avatar["src"]
+    return avatar.attrs["src"]
 
 
 def get_profile_description(element: Tag) -> str:
@@ -37,7 +43,8 @@ def get_profile_description(element: Tag) -> str:
 
 def get_profile_description_images(element: Tag) -> str:
     images = element.select(selectors["description_images_selector"])
-    return "\n".join([image["src"] for image in images])
+
+    return "\n".join([image.attrs["src"] for image in images])
 
 
 def get_profile_details(element: Tag) -> dict[str, str]:
@@ -45,18 +52,21 @@ def get_profile_details(element: Tag) -> dict[str, str]:
     details = element.select(selectors["details_selector"])
 
     for detail in details:
-        text = detail.dt.text
+        el = detail.dd
+
+        if el is None:
+            continue
+
+        text = el.text.strip()
 
         if text in fields:
             if text == "Interests":
-                interests = detail.dd.select(selectors["interests_selector"])
+                interests = el.select(selectors["interests_selector"])
                 value = "\n".join(interest.text.strip() for interest in interests)
             elif text == "Email address":
-                value = detail.dd.text.replace(
-                    " (Visible to other course participants)", ""
-                )
+                value = text.replace(" (Visible to other course participants)", "")
             else:
-                value = detail.dd.text
+                value = text
 
             attributes[fields[text]] = value
 
@@ -71,9 +81,12 @@ def get_profile_courses(element: Tag) -> str:
 
 
 def get_profile_last_access(element: Tag) -> str:
-    return element.select_one(selectors["last_access_selector"]).text.replace(
-        "\xa0", ";"
-    )
+    last_access = element.select_one(selectors["last_access_selector"])
+
+    if last_access is None:
+        return ""
+
+    return last_access.text.replace("\xa0", ";")
 
 
 def get_profile_attributes(element: Tag) -> dict[str, str]:
@@ -91,6 +104,9 @@ def get_profile_attributes(element: Tag) -> dict[str, str]:
     for section in sections:
         attribute = section.select_one(selectors["attribute_selector"])
 
+        if attribute is None:
+            continue
+
         if attribute.text == "User details":
             profile |= get_profile_details(section)
         elif attribute.text == "Course details":
@@ -105,7 +121,7 @@ def get_profile(session: requests.Session, profile_id: int) -> dict[str, str]:
     profile_url = f"https://courses.finki.ukim.mk/user/profile.php?id={profile_id}&showallcourses=1"
     response = session.get(profile_url)
 
-    if response.status_code != 200:
+    if response.status_code != http_ok:
         return {}
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -116,9 +132,13 @@ def get_profile(session: requests.Session, profile_id: int) -> dict[str, str]:
         return {}
 
     if profile:
-        profile["ID"] = profile_id
+        profile["ID"] = str(profile_id)
 
     return profile
+
+
+def get_lambda(session: requests.Session) -> Callable[[int], dict[str, str]]:
+    return lambda x: get_profile(session, x)
 
 
 def get_profiles(
@@ -127,7 +147,7 @@ def get_profiles(
     with ThreadPoolExecutor(max_workers=threads) as executor:
         profiles = list(
             tqdm(
-                executor.map(lambda x: get_profile(session, x), profile_ids),
+                executor.map(get_lambda(session), profile_ids),
                 total=len(profile_ids),
             )
         )
@@ -185,9 +205,11 @@ def main() -> None:
     else:
         return
 
-    os.makedirs("output", exist_ok=True)
+    output_path = Path("output")
+
+    output_path.mkdir(exist_ok=True, parents=True)
     df = reorder_columns(pd.DataFrame(profiles), columns)
-    df.to_csv("output/" + args.o, index=False)
+    df.to_csv(output_path / args.o, index=False)
 
     print(df.tail())
     print(f"Finished in {time.time() - start} seconds")
