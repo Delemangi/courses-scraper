@@ -16,7 +16,6 @@ tqdm = "^4.66.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
 ruff = "^0.1.14"
-pre-commit = "^3.6.0"
 pandas-stubs = "^2.1.4.231227"
 types-tqdm = "^4.66.0.20240106"
 types-beautifulsoup4 = "^4.12.0.20240106"
