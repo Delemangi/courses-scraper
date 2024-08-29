@@ -1,8 +1,8 @@
 import argparse
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Callable
 
 import pandas as pd
 import requests
@@ -52,23 +52,24 @@ def get_profile_details(element: Tag) -> dict[str, str]:
     details = element.select(selectors["details_selector"])
 
     for detail in details:
-        el = detail.dd
+        field_element = detail.dt
+        value_element = detail.dd
 
-        if el is None:
+        if field_element is None or value_element is None:
             continue
 
-        text = el.text.strip()
+        field = field_element.text.strip().lower()
 
-        if text in fields:
-            if text == "Interests":
-                interests = el.select(selectors["interests_selector"])
+        if field in fields:
+            value = value_element.text.strip()
+
+            if field == "interests":
+                interests = value_element.select(selectors["interests_selector"])
                 value = "\n".join(interest.text.strip() for interest in interests)
-            elif text == "Email address":
-                value = text.replace(" (Visible to other course participants)", "")
-            else:
-                value = text
+            elif field == "email address":
+                value = value.replace(" (Visible to other course participants)", "")
 
-            attributes[fields[text]] = value
+            attributes[fields[field]] = value
 
     return attributes
 

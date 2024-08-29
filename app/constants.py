@@ -12,18 +12,18 @@ selectors = {
 }
 
 fields = {
-    "Email address": "Mail",
-    "Web page": "Web",
-    "Interests": "Interests",
-    "ICQ number": "ICQ",
-    "Skype ID": "Skype",
-    "Yahoo ID": "Yahoo",
-    "AIM ID": "AIM",
-    "MSN ID": "MSN",
-    "Country": "Country",
-    "City/town": "City",
-    "MoodleNet profile": "MoodleNet",
-    "Avatar": "Avatar",
+    "email address": "Mail",
+    "web page": "Web",
+    "interests": "Interests",
+    "icq number": "ICQ",
+    "skype id": "Skype",
+    "yahoo id": "Yahoo",
+    "aim id": "AIM",
+    "msn id": "MSN",
+    "country": "Country",
+    "city/town": "City",
+    "moodlenet profile": "MoodleNet",
+    "avatar": "Avatar",
 }
 
 columns = [
