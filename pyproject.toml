@@ -7,19 +7,19 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-requests = "^2.31.0"
+requests = "^2.32.3"
 beautifulsoup4 = "^4.12.3"
-pandas = "^2.2.0"
-tqdm = "^4.66.1"
+pandas = "^2.2.2"
+tqdm = "^4.66.5"
 
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
-ruff = "^0.1.14"
-pandas-stubs = "^2.1.4.231227"
-types-tqdm = "^4.66.0.20240106"
-types-beautifulsoup4 = "^4.12.0.20240106"
-types-requests = "^2.31.0.20240106"
+mypy = "^1.11.2"
+ruff = "^0.6.3"
+pandas-stubs = "^2.2.2.240807"
+types-tqdm = "^4.66.0.20240417"
+types-beautifulsoup4 = "^4.12.0.20240511"
+types-requests = "^2.32.0.20240712"
 
 [build-system]
 requires = ["poetry-core"]
