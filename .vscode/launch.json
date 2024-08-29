@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Python Debugger: Module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "app",
+            "args": [
+                "-c",
+                "te40g0vtldhhsc4p26a3ljhokg",
+                "-i",
+                "10870"
+            ]
+        },
+    ]
+}
