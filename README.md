@@ -1,10 +1,16 @@
 # Courses Scraper
 
-Script for scraping all profiles from Courses.
+Script for scraping all profiles from FCSE Courses into CSV format.
+
+## TL;DR
+
+1. Install `uv`
+2. Get your Courses `MOODLESESSION` cookie
+3. Run `uv run python -m app -m 17000 -c <COOKIE>`
 
 ## Installation
 
-Python >= 3.9 is required.
+Python 3.12 or higher is required and `uv` is optional.
 
 `python -m pip install -r requirements.txt`
 
@@ -21,3 +27,7 @@ Arguments:
 5. `-m` - upper limit of profile IDs to be scraped
 
 The arguments `-c` and either one of `-i` or `-m` are required.
+
+For example:
+
+`python -m app -m 16500 -c f82jike0jehnbvitk87et14fku`
