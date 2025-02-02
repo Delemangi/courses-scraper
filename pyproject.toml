@@ -1,76 +1,72 @@
-[tool.poetry]
+[project]
 name = "courses-scraper"
 version = "0.1.0"
-description = ""
-authors = ["Delemangi <milev.stefan@gmail.com>"]
+description = "Courses Scraper"
 readme = "README.md"
+requires-python = "~=3.13"
+dependencies = [
+    "requests>=2.32.3,<3",
+    "beautifulsoup4>=4.13.0,<5",
+    "pandas>=2.2.3,<3",
+    "tqdm>=4.67.1,<5",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-requests = "^2.32.3"
-beautifulsoup4 = "^4.12.3"
-pandas = "^2.2.2"
-tqdm = "^4.66.5"
-
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.11.2"
-ruff = "^0.6.3"
-pandas-stubs = "^2.2.2.240807"
-types-tqdm = "^4.66.0.20240417"
-types-beautifulsoup4 = "^4.12.0.20240511"
-types-requests = "^2.32.0.20240712"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1,<2",
+    "ruff>=0.9.4,<1",
+    "pandas-stubs>=2.2.3.241126,<3",
+    "types-tqdm>=4.67.0.20241221,<5",
+    "types-beautifulsoup4>=4.12.0.20241020,<5",
+    "types-requests>=2.32.0.20241016,<3",
+]
 
 [tool.mypy]
 strict = true
 
 [tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
 select = [
-    # pyflakes
     "F",
-    # pycodestyle
     "E",
     "W",
-    # mccabe
-    "C90",
-    # pep8-naming
+    "I",
     "N",
-    # pyupgrade
     "UP",
-    # flake8-2020
     "YTT",
-    # flake8-annotations
     "ANN",
-    # flake8-bandit
+    "ASYNC",
     "S",
-    # flake8-bugbear
     "B",
-    # flake8-builtins
-    "A",
-    # flake8-quotes
-    "Q",
-    # flake8-pie
+    "COM",
+    "C4",
+    "DTZ",
+    "FA",
+    "ISC",
+    "ICN",
+    "G",
+    "INP",
     "PIE",
-    # flake8-pyi
-    "PYI",
-    # flake8-return
+    "PT",
+    "Q",
+    "RSE",
     "RET",
-    # flake8-simplify
+    "SLF",
     "SIM",
-    # flake8-unused-arguments
-    "ARG",
-    # flake8-use-pathlib
+    "TID",
     "PTH",
-    # pylint
+    "PGH",
     "PL",
-    # ruff
+    "TRY",
+    "FLY",
+    "PERF",
+    "FURB",
+    "LOG",
     "RUF",
 ]
-target-version = "py311"
+ignore = ["PLR2004", "PLR0912", "PLR0915", "TRY003", "PLR0911", "RET504"]
 
 [tool.ruff.format]
 quote-style = "double"
